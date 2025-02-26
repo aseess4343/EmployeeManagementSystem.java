@@ -1,0 +1,135 @@
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+// Employee class to represent an employee
+class Employee implements Serializable {
+    private String name;
+    private int id;
+    private double salary;
+
+    public Employee(String name, int id, double salary) {
+        this.name = name;
+        this.id = id;
+        this.salary = salary;
+    }
+
+    // Getters and Setters
+    public String getName() {
+        return name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "name='" + name + '\'' +
+                ", id=" + id +
+                ", salary=" + salary +
+                '}';
+    }
+}
+
+// EmployeeManager class to manage employee operations
+class EmployeeManager {
+    private List<Employee> employees;
+
+    public EmployeeManager() {
+        employees = new ArrayList<>();
+    }
+
+    // Add an employee
+    public void addEmployee(Employee employee) {
+        employees.add(employee);
+        System.out.println("Employee added: " + employee.getName());
+    }
+
+    // View all employees
+    public void viewEmployees() {
+        if (employees.isEmpty()) {
+            System.out.println("No employees found.");
+        } else {
+            System.out.println("Employee List:");
+            for (Employee emp : employees) {
+                System.out.println(emp);
+            }
+        }
+    }
+
+    // Save employees to a file
+    public void saveEmployeesToFile(String filename) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename))) {
+            oos.writeObject(employees);
+            System.out.println("Employees saved to " + filename);
+        } catch (IOException e) {
+            System.out.println("Error saving employees: " + e.getMessage());
+        }
+    }
+
+    // Load employees from a file
+    @SuppressWarnings("unchecked")
+    public void loadEmployeesFromFile(String filename) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename))) {
+            employees = (List<Employee>) ois.readObject();
+            System.out.println("Employees loaded from " + filename);
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error loading employees: " + e.getMessage());
+        }
+    }
+}
+
+// Main class to run the application
+public class EmployeeManagementSystem {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        EmployeeManager manager = new EmployeeManager();
+        String filename = "employees.dat";
+
+        while (true) {
+            System.out.println("\nEmployee Management System");
+            System.out.println("1. Add Employee");
+            System.out.println("2. View Employees");
+            System.out.println("3. Save Employees to File");
+            System.out.println("4. Load Employees from File");
+            System.out.println("5. Exit");
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter employee name: ");
+                    String name = scanner.nextLine();
+                    System.out.print("Enter employee ID: ");
+                    int id = scanner.nextInt();
+                    System.out.print("Enter employee salary: ");
+                    double salary = scanner.nextDouble();
+                    manager.addEmployee(new Employee(name, id, salary));
+                    break;
+                case 2:
+                    manager.viewEmployees();
+                    break;
+                case 3:
+                    manager.saveEmployeesToFile(filename);
+                    break;
+                case 4:
+                    manager.loadEmployeesFromFile(filename);
+                    break;
+                case 5:
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
+    }
+}
